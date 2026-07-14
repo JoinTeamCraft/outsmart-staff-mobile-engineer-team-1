@@ -16,16 +16,33 @@ streaklearn/
 │   └── shared/                   <- Common UI widgets and themes
 ```
 
-## Running the App
-1. Make sure Flutter SDK is installed.
-2. Fetch dependencies:
+## Getting Started
+
+### Prerequisites
+- **Flutter SDK** (stable channel). Verify with `flutter --version`.
+- **Web:** Google Chrome — no extra toolchain required (easiest target for iteration).
+- **Android:** Android Studio + Android SDK, and a running emulator or connected device.
+- **iOS/macOS:** Full **Xcode** (from the App Store) plus **CocoaPods** (`brew install cocoapods`), and a simulator or connected device.
+
+Run `flutter doctor` to confirm the toolchains for your target platform are set up.
+
+### Running the App
+1. Fetch dependencies:
    ```bash
    flutter pub get
    ```
-3. Run the application:
+2. List available devices:
    ```bash
-   flutter run
+   flutter devices
    ```
+3. Run on a specific target:
+   ```bash
+   flutter run -d chrome   # web (fastest to start)
+   flutter run -d macos    # macOS desktop
+   flutter run             # or pick from the device list if only one is connected
+   ```
+
+> The repo already includes the `android/`, `ios/`, `web/`, and `macos/` platform folders, so no `flutter create` step is needed.
 
 ## Development & Collaboration Rules
 - **No Direct Commits to `main`:** All work must be done on track-specific branches (e.g., `track-a/data-layer`).
