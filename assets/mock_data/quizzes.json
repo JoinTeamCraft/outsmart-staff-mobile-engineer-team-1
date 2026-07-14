@@ -1,0 +1,30 @@
+[
+  {
+    "lessonId": "lesson-1",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "What is the core building block of a Flutter UI?",
+        "options": ["Widget", "Activity", "Component", "View"],
+        "correctIndex": 0
+      },
+      {
+        "id": "q2",
+        "question": "Which tree is responsible for handling layouts and paints?",
+        "options": ["Widget Tree", "Element Tree", "RenderObject Tree", "State Tree"],
+        "correctIndex": 2
+      }
+    ]
+  },
+  {
+    "lessonId": "lesson-2",
+    "questions": [
+      {
+        "id": "q3",
+        "question": "What keyword is used to pause execution until a Future completes?",
+        "options": ["await", "defer", "wait", "async"],
+        "correctIndex": 0
+      }
+    ]
+  }
+]

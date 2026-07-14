@@ -1,0 +1,23 @@
+[
+  {
+    "id": "lesson-1",
+    "title": "Flutter Basics & Widgets",
+    "topic": "Fundamentals",
+    "thumbnail": "https://images.unsplash.com/photo-1618401471353-b98aedd07871?w=200",
+    "content": "In Flutter, everything is a widget. Widgets are nested to build the UI structure. The widget tree consists of structural, stylistic, and behavioral elements."
+  },
+  {
+    "id": "lesson-2",
+    "title": "Asynchronous Programming in Dart",
+    "topic": "Dart",
+    "thumbnail": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=200",
+    "content": "Dart uses Futures and Streams to handle asynchronous work. The async and await keywords allow you to write asynchronous code that reads like synchronous code."
+  },
+  {
+    "id": "lesson-3",
+    "title": "State Management with Providers",
+    "topic": "State Management",
+    "thumbnail": "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=200",
+    "content": "State management is the practice of managing changes to data within the app. Providers propagate changes down the widget tree using InheritedWidgets."
+  }
+]
