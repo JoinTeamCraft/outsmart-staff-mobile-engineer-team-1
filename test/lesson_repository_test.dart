@@ -1,8 +1,29 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:streaklearn/core/cache/memory_cache.dart';
 import 'package:streaklearn/core/di/service_locator.dart';
 import 'package:streaklearn/core/network/api_client.dart';
 import 'package:streaklearn/features/lessons/data/lesson_repository.dart';
+
+const lessonsJson = '''
+[
+  {
+    "id": "lesson-1",
+    "title": "Flutter Basics",
+    "topic": "Fundamentals",
+    "thumbnail": "thumb1.png",
+    "content": "Everything is a widget."
+  },
+  {
+    "id": "lesson-2",
+    "title": "Async Dart",
+    "topic": "Dart",
+    "thumbnail": "thumb2.png",
+    "content": "Futures and Streams."
+  }
+]
+''';
 
 class FakeApiClient extends ApiClient {
   int fetchCount = 0;
@@ -10,24 +31,7 @@ class FakeApiClient extends ApiClient {
   @override
   Future<String> getLessonsRaw() async {
     fetchCount++;
-    return '''
-    [
-      {
-        "id": "lesson-1",
-        "title": "Flutter Basics",
-        "topic": "Fundamentals",
-        "thumbnail": "thumb1.png",
-        "content": "Everything is a widget."
-      },
-      {
-        "id": "lesson-2",
-        "title": "Async Dart",
-        "topic": "Dart",
-        "thumbnail": "thumb2.png",
-        "content": "Futures and Streams."
-      }
-    ]
-    ''';
+    return lessonsJson;
   }
 }
 
@@ -119,6 +123,34 @@ void main() {
       expect(api.fetchCount, 1);
     });
 
+    test('completed fetch does not drop a newer force-refresh request',
+        () async {
+      final api = ControlledApiClient();
+      final repo = LessonRepository(apiClient: api);
+
+      final first = repo.getLessons();
+      final second = repo.getLessons(forceRefresh: true);
+      expect(api.completers, hasLength(2));
+
+      api.completers[0].complete(lessonsJson);
+      await first;
+
+      final third = repo.getLessons();
+      expect(api.completers, hasLength(2),
+          reason: 'third call must join the in-flight refresh');
+
+      api.completers[1].complete(lessonsJson);
+      expect(await second, hasLength(2));
+      expect(await third, hasLength(2));
+    });
+
+    test('malformed lesson JSON throws FormatException', () async {
+      final api = _MalformedApiClient();
+      final repo = LessonRepository(apiClient: api);
+
+      await expectLater(repo.getLessons(), throwsFormatException);
+    });
+
     test('getLessonById rejects an empty id with ArgumentError', () async {
       final repo = LessonRepository(apiClient: FakeApiClient());
 
@@ -146,6 +178,22 @@ void main() {
       expect(locator<LessonRepository>(), isA<LessonRepository>());
     });
   });
+}
+
+class ControlledApiClient extends ApiClient {
+  final completers = <Completer<String>>[];
+
+  @override
+  Future<String> getLessonsRaw() {
+    final completer = Completer<String>();
+    completers.add(completer);
+    return completer.future;
+  }
+}
+
+class _MalformedApiClient extends ApiClient {
+  @override
+  Future<String> getLessonsRaw() async => '[{"id": "lesson-1"}]';
 }
 
 class _FailingOnceApiClient extends FakeApiClient {

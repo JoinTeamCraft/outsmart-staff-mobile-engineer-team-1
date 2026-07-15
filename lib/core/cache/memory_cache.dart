@@ -7,6 +7,8 @@ class MemoryCache<K, V> {
 
   static const Duration defaultTtl = Duration(minutes: 5);
 
+  /// An entry is served for strictly less than [ttl] after being stored;
+  /// at exactly [ttl] it is treated as expired and evicted on read.
   final Duration ttl;
   final DateTime Function() _clock;
   final _entries = <K, _CacheEntry<V>>{};

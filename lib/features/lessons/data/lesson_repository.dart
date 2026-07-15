@@ -22,18 +22,25 @@ class LessonRepository {
   final MemoryCache<String, List<Lesson>> _cache;
   Future<List<Lesson>>? _inFlight;
 
-  Future<List<Lesson>> getLessons({bool forceRefresh = false}) {
+  Future<List<Lesson>> getLessons({bool forceRefresh = false}) async {
     if (forceRefresh) {
       _cache.invalidate(_lessonsKey);
     } else {
       final cached = _cache.get(_lessonsKey);
-      if (cached != null) return Future.value(cached);
+      if (cached != null) return cached;
 
       final pending = _inFlight;
       if (pending != null) return pending;
     }
 
-    final request = _fetchLessons();
+    // No awaits between here and the _inFlight assignment, so concurrent
+    // callers always observe the request created below. Completion only
+    // clears its own tracking: a fetch superseded by forceRefresh must not
+    // drop the newer in-flight request.
+    late final Future<List<Lesson>> request;
+    request = _fetchLessons().whenComplete(() {
+      if (identical(_inFlight, request)) _inFlight = null;
+    });
     _inFlight = request;
     return request;
   }
@@ -50,15 +57,11 @@ class LessonRepository {
   }
 
   Future<List<Lesson>> _fetchLessons() async {
-    try {
-      final raw = await _apiClient.getLessonsRaw();
-      final lessons = (jsonDecode(raw) as List)
-          .map((e) => Lesson.fromJson(e as Map<String, dynamic>))
-          .toList();
-      _cache.set(_lessonsKey, lessons);
-      return lessons;
-    } finally {
-      _inFlight = null;
-    }
+    final raw = await _apiClient.getLessonsRaw();
+    final lessons = (jsonDecode(raw) as List)
+        .map((e) => Lesson.fromJson(e as Map<String, dynamic>))
+        .toList();
+    _cache.set(_lessonsKey, lessons);
+    return lessons;
   }
 }
