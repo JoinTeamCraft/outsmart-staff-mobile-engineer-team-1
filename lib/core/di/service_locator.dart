@@ -5,9 +5,13 @@ import '../state/app_state_manager.dart';
 final GetIt locator = GetIt.instance;
 
 void setupLocator() {
-  locator.registerLazySingleton<ApiClient>(() => ApiClient());
-  locator.registerLazySingleton<AppStateManager>(
-    () => AppStateManager(),
-    dispose: (manager) => manager.dispose(),
-  );
+  if (!locator.isRegistered<ApiClient>()) {
+    locator.registerLazySingleton<ApiClient>(() => ApiClient());
+  }
+  if (!locator.isRegistered<AppStateManager>()) {
+    locator.registerLazySingleton<AppStateManager>(
+      () => AppStateManager(),
+      dispose: (manager) => manager.dispose(),
+    );
+  }
 }

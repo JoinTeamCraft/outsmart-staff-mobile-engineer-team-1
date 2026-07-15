@@ -106,6 +106,7 @@ void main() {
 
   test('locator reset disposes the manager and further use throws', () async {
     setupLocator();
+    setupLocator();
     final manager = locator<AppStateManager>();
     await locator.reset();
 
