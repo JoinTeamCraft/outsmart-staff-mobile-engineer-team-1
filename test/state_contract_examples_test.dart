@@ -14,10 +14,16 @@ class StreakBadge extends StatelessWidget {
   }
 }
 
+AppStateManager newManager({DateTime Function()? clock}) {
+  final state = AppStateManager(clock: clock);
+  addTearDown(state.dispose);
+  return state;
+}
+
 void main() {
   group('AppStateManager', () {
     test('completeLesson is idempotent and emits one event', () async {
-      final state = AppStateManager();
+      final state = newManager();
       final events = <AppStateEvent>[];
       final sub = state.events.listen(events.add);
       addTearDown(sub.cancel);
@@ -32,7 +38,7 @@ void main() {
     });
 
     test('completeQuiz stores result with accuracy and pass mark', () {
-      final state = AppStateManager(clock: () => DateTime(2026, 7, 14));
+      final state = newManager(clock: () => DateTime(2026, 7, 14));
 
       state.completeQuiz(
         quizId: 'quiz_flutter_basics',
@@ -49,7 +55,7 @@ void main() {
 
     test('streak increments on consecutive days and resets after a gap', () {
       var today = DateTime(2026, 7, 14);
-      final state = AppStateManager(clock: () => today);
+      final state = newManager(clock: () => today);
 
       state.completeLesson('l1');
       expect(state.streakCount, 1);
@@ -67,7 +73,7 @@ void main() {
     });
 
     test('rejects invalid input with ArgumentError', () {
-      final state = AppStateManager();
+      final state = newManager();
 
       expect(() => state.completeLesson('   '), throwsArgumentError);
       expect(
@@ -87,7 +93,7 @@ void main() {
     });
 
     test('resetState clears progress and emits StreakChangedEvent', () async {
-      final state = AppStateManager();
+      final state = newManager();
       final events = <AppStateEvent>[];
       final sub = state.events.listen(events.add);
       addTearDown(sub.cancel);
@@ -104,13 +110,21 @@ void main() {
     });
   });
 
-  test('locator reset disposes the manager and further use throws', () async {
-    setupLocator();
-    setupLocator();
-    final manager = locator<AppStateManager>();
-    await locator.reset();
+  group('service locator', () {
+    tearDown(locator.reset);
 
-    expect(() => manager.completeLesson('lesson-1'), throwsStateError);
+    test('setupLocator is idempotent', () {
+      setupLocator();
+      expect(setupLocator, returnsNormally);
+    });
+
+    test('reset disposes the manager and further use throws', () async {
+      setupLocator();
+      final manager = locator<AppStateManager>();
+      await locator.reset();
+
+      expect(() => manager.completeLesson('lesson-1'), throwsStateError);
+    });
   });
 
   testWidgets('contract widget example reads streak via provider',
@@ -126,5 +140,8 @@ void main() {
     );
 
     expect(find.text('1 day streak'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    state.dispose();
   });
 }

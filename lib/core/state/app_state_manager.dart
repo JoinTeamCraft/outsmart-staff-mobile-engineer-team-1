@@ -11,7 +11,8 @@ export 'quiz_result.dart';
 /// Single source of truth for lesson completion, quiz results and the daily
 /// streak. See STATE_CONTRACT.md for the full contract and usage examples.
 class AppStateManager extends ChangeNotifier {
-  AppStateManager({DateTime Function()? clock}) : _clock = clock ?? DateTime.now;
+  AppStateManager({DateTime Function()? clock})
+      : _clock = clock ?? DateTime.now;
 
   final DateTime Function() _clock;
   final Set<String> _completedLessonIds = {};
@@ -100,7 +101,8 @@ class AppStateManager extends ChangeNotifier {
     _lastActivityDate = today;
 
     if (_streakCount != previous) {
-      _events.add(StreakChangedEvent(previous: previous, current: _streakCount));
+      _events
+          .add(StreakChangedEvent(previous: previous, current: _streakCount));
     }
   }
 

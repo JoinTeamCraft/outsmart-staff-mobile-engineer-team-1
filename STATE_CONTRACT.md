@@ -79,7 +79,8 @@ Every event extends the sealed class `AppStateEvent`:
 | `StreakChangedEvent` | `previous`, `current` | The streak count changes |
 
 `QuizResult` fields: `quizId`, `score`, `totalQuestions`, `completedAt`,
-plus derived `accuracy` (0.0–1.0) and `passed` (accuracy >= 0.7).
+plus derived `accuracy` (0.0–1.0) and `passed` (accuracy >=
+`QuizResult.passThreshold`, currently 0.7).
 
 ## Examples
 
