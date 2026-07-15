@@ -31,6 +31,9 @@ class AppStateManager extends ChangeNotifier {
       _completedLessonIds.contains(lessonId);
 
   void completeLesson(String lessonId) {
+    if (lessonId.trim().isEmpty) {
+      throw ArgumentError.value(lessonId, 'lessonId', 'must not be empty');
+    }
     if (!_completedLessonIds.add(lessonId)) return;
     _events.add(LessonCompletedEvent(lessonId));
     _recordActivity();
@@ -42,6 +45,17 @@ class AppStateManager extends ChangeNotifier {
     required int score,
     required int totalQuestions,
   }) {
+    if (quizId.trim().isEmpty) {
+      throw ArgumentError.value(quizId, 'quizId', 'must not be empty');
+    }
+    if (totalQuestions <= 0) {
+      throw ArgumentError.value(
+          totalQuestions, 'totalQuestions', 'must be greater than zero');
+    }
+    if (score < 0 || score > totalQuestions) {
+      throw ArgumentError.value(
+          score, 'score', 'must be between 0 and totalQuestions');
+    }
     _lastQuizResult = QuizResult(
       quizId: quizId,
       score: score,

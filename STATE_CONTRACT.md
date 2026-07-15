@@ -10,7 +10,9 @@ The state layer lives in `lib/core/state/`:
 
 `AppStateManager` is a `ChangeNotifier` registered as a lazy singleton in the
 service locator and exposed to the widget tree through `provider` in
-`main.dart`.
+`main.dart`. The locator owns its lifecycle (its registration passes a
+`dispose` callback); the widget tree only borrows it via
+`ChangeNotifierProvider.value`, which never disposes the value it is given.
 
 Do not hold feature-level copies of this state. Read it from the manager,
 write it through the methods below, and react to one-shot side effects via
@@ -57,6 +59,9 @@ void completeQuiz({
 void resetState();
 ```
 
+- Both completion methods validate their input and throw an
+  `ArgumentError` for an empty/whitespace id, `totalQuestions <= 0`,
+  or a `score` outside `0..totalQuestions`.
 - `completeLesson` is idempotent: re-completing a lesson is a no-op.
 - Both completion methods record daily activity, which drives the streak:
   first activity sets it to 1, next-day activity increments it, a gap of

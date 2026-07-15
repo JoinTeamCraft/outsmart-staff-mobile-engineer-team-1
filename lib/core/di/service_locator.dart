@@ -6,5 +6,8 @@ final GetIt locator = GetIt.instance;
 
 void setupLocator() {
   locator.registerLazySingleton<ApiClient>(() => ApiClient());
-  locator.registerLazySingleton<AppStateManager>(() => AppStateManager());
+  locator.registerLazySingleton<AppStateManager>(
+    () => AppStateManager(),
+    dispose: (manager) => manager.dispose(),
+  );
 }

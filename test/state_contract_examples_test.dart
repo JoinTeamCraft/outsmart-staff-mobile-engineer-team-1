@@ -64,6 +64,26 @@ void main() {
       expect(state.streakCount, 1, reason: 'gap over one day resets streak');
     });
 
+    test('rejects invalid input with ArgumentError', () {
+      final state = AppStateManager();
+
+      expect(() => state.completeLesson('   '), throwsArgumentError);
+      expect(
+        () => state.completeQuiz(quizId: '', score: 1, totalQuestions: 5),
+        throwsArgumentError,
+      );
+      expect(
+        () => state.completeQuiz(quizId: 'q1', score: 0, totalQuestions: 0),
+        throwsArgumentError,
+      );
+      expect(
+        () => state.completeQuiz(quizId: 'q1', score: 6, totalQuestions: 5),
+        throwsArgumentError,
+      );
+      expect(state.completedLessonIds, isEmpty);
+      expect(state.lastQuizResult, isNull);
+    });
+
     test('resetState clears progress and emits StreakChangedEvent', () async {
       final state = AppStateManager();
       final events = <AppStateEvent>[];
