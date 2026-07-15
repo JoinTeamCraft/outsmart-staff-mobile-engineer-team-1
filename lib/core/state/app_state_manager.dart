@@ -2,42 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-sealed class AppStateEvent {
-  const AppStateEvent();
-}
+import 'app_state_event.dart';
+import 'quiz_result.dart';
 
-class LessonCompletedEvent extends AppStateEvent {
-  const LessonCompletedEvent(this.lessonId);
-  final String lessonId;
-}
-
-class QuizCompletedEvent extends AppStateEvent {
-  const QuizCompletedEvent(this.result);
-  final QuizResult result;
-}
-
-class StreakChangedEvent extends AppStateEvent {
-  const StreakChangedEvent({required this.previous, required this.current});
-  final int previous;
-  final int current;
-}
-
-class QuizResult {
-  const QuizResult({
-    required this.quizId,
-    required this.score,
-    required this.totalQuestions,
-    required this.completedAt,
-  });
-
-  final String quizId;
-  final int score;
-  final int totalQuestions;
-  final DateTime completedAt;
-
-  double get accuracy => totalQuestions == 0 ? 0 : score / totalQuestions;
-  bool get passed => accuracy >= 0.7;
-}
+export 'app_state_event.dart';
+export 'quiz_result.dart';
 
 /// Single source of truth for lesson completion, quiz results and the daily
 /// streak. See STATE_CONTRACT.md for the full contract and usage examples.

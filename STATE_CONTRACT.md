@@ -1,9 +1,16 @@
 # State Management Contract
 
 This document defines how every track reads and writes shared app state.
-The state layer is `AppStateManager` (`lib/core/state/app_state_manager.dart`),
-a `ChangeNotifier` registered as a lazy singleton in the service locator and
-exposed to the widget tree through `provider` in `main.dart`.
+The state layer lives in `lib/core/state/`:
+
+- `app_state_manager.dart` — `AppStateManager`, the only entry point you
+  need to import (it re-exports the files below)
+- `app_state_event.dart` — the sealed `AppStateEvent` hierarchy
+- `quiz_result.dart` — the `QuizResult` model
+
+`AppStateManager` is a `ChangeNotifier` registered as a lazy singleton in the
+service locator and exposed to the widget tree through `provider` in
+`main.dart`.
 
 Do not hold feature-level copies of this state. Read it from the manager,
 write it through the methods below, and react to one-shot side effects via
