@@ -1,4 +1,6 @@
 import 'package:get_it/get_it.dart';
+import 'package:streaklearn/features/lessons/data/lesson_repository.dart';
+
 import '../network/api_client.dart';
 import '../state/app_state_manager.dart';
 
@@ -12,6 +14,11 @@ void setupLocator() {
     locator.registerLazySingleton<AppStateManager>(
       () => AppStateManager(),
       dispose: (manager) => manager.dispose(),
+    );
+  }
+  if (!locator.isRegistered<LessonRepository>()) {
+    locator.registerLazySingleton<LessonRepository>(
+      () => LessonRepository(apiClient: locator<ApiClient>()),
     );
   }
 }
