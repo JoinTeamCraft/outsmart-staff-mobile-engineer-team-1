@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 import 'package:streaklearn/core/di/service_locator.dart';
 import 'package:streaklearn/core/state/app_state_manager.dart';
 import 'package:streaklearn/features/streaks/presentation/streak_celebration_listener.dart';
@@ -11,13 +12,18 @@ Future<void> pumpEvent(WidgetTester tester) async {
   await tester.pump();
 }
 
+/// Mirrors the production wiring in main.dart: the manager is provided
+/// above MaterialApp and the listener resolves it from the widget tree.
 Future<void> pumpApp(WidgetTester tester) async {
   await tester.pumpWidget(
-    MaterialApp(
-      builder: (context, child) => StreakCelebrationListener(
-        child: child ?? const SizedBox.shrink(),
+    ChangeNotifierProvider.value(
+      value: locator<AppStateManager>(),
+      child: MaterialApp(
+        builder: (context, child) => StreakCelebrationListener(
+          child: child ?? const SizedBox.shrink(),
+        ),
+        home: const Scaffold(body: Text('home')),
       ),
-      home: const Scaffold(body: Text('home')),
     ),
   );
 }
@@ -71,6 +77,19 @@ void main() {
 
     expect(find.text('Quiz passed 4/5!'), findsOneWidget);
     await tester.pump(const Duration(seconds: 3));
+  });
+
+  testWidgets('unmounting during the display window does not throw',
+      (tester) async {
+    await pumpApp(tester);
+    locator<AppStateManager>().completeLesson('lesson-1');
+    await pumpEvent(tester);
+    expect(find.text('1 day streak!'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(seconds: 3));
+
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('a failed quiz does not celebrate', (tester) async {

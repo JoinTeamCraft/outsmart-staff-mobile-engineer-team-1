@@ -4,6 +4,10 @@ import '../state/app_state_manager.dart';
 
 final GetIt locator = GetIt.instance;
 
+/// Registers app-wide singletons. Idempotent: repeat calls (hot restart,
+/// test setup alongside main) keep the first registration. Tests that need
+/// a fresh graph (e.g. an AppStateManager with a custom clock) must call
+/// `locator.reset()` before registering their own instances.
 void setupLocator() {
   if (!locator.isRegistered<ApiClient>()) {
     locator.registerLazySingleton<ApiClient>(() => ApiClient());

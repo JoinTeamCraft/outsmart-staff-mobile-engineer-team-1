@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../../../core/di/service_locator.dart';
 import '../../../core/state/app_state_manager.dart';
 
 /// Overlays a short-lived celebration banner whenever the state layer
@@ -15,11 +15,16 @@ import '../../../core/state/app_state_manager.dart';
 class StreakCelebrationListener extends StatefulWidget {
   const StreakCelebrationListener({
     required this.child,
+    this.stateManager,
     this.displayDuration = const Duration(seconds: 2),
     super.key,
   });
 
   final Widget child;
+
+  /// Resolved from the widget tree (`context.read`) when null;
+  /// injectable for tests.
+  final AppStateManager? stateManager;
   final Duration displayDuration;
 
   @override
@@ -35,7 +40,8 @@ class _StreakCelebrationListenerState extends State<StreakCelebrationListener> {
   @override
   void initState() {
     super.initState();
-    _subscription = locator<AppStateManager>().events.listen(_handleEvent);
+    final manager = widget.stateManager ?? context.read<AppStateManager>();
+    _subscription = manager.events.listen(_handleEvent);
   }
 
   void _handleEvent(AppStateEvent event) {
@@ -52,14 +58,15 @@ class _StreakCelebrationListenerState extends State<StreakCelebrationListener> {
     _dismissTimer?.cancel();
     setState(() => _message = message);
     _dismissTimer = Timer(widget.displayDuration, () {
+      if (!mounted) return;
       setState(() => _message = null);
     });
   }
 
   @override
   void dispose() {
-    _dismissTimer?.cancel();
     _subscription?.cancel();
+    _dismissTimer?.cancel();
     super.dispose();
   }
 

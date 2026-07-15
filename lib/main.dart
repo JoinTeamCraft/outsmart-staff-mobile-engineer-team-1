@@ -8,6 +8,10 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   setupLocator();
+  assert(
+    locator.isRegistered<AppStateManager>(),
+    'setupLocator() must register AppStateManager before the app is built',
+  );
 
   runApp(
     ChangeNotifierProvider.value(
