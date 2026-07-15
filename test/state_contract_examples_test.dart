@@ -19,7 +19,8 @@ void main() {
     test('completeLesson is idempotent and emits one event', () async {
       final state = AppStateManager();
       final events = <AppStateEvent>[];
-      state.events.listen(events.add);
+      final sub = state.events.listen(events.add);
+      addTearDown(sub.cancel);
 
       state.completeLesson('lesson_1');
       state.completeLesson('lesson_1');
@@ -88,7 +89,8 @@ void main() {
     test('resetState clears progress and emits StreakChangedEvent', () async {
       final state = AppStateManager();
       final events = <AppStateEvent>[];
-      state.events.listen(events.add);
+      final sub = state.events.listen(events.add);
+      addTearDown(sub.cancel);
 
       state.completeLesson('lesson_1');
       state.resetState();
