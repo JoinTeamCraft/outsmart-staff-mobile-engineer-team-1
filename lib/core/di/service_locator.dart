@@ -1,8 +1,16 @@
 import 'package:get_it/get_it.dart';
+import '../../features/lessons/data/lesson_repository.dart';
 import '../network/api_client.dart';
 
 final GetIt locator = GetIt.instance;
 
 void setupLocator() {
-  locator.registerLazySingleton<ApiClient>(() => ApiClient());
+  if (!locator.isRegistered<ApiClient>()) {
+    locator.registerLazySingleton<ApiClient>(() => ApiClient());
+  }
+  if (!locator.isRegistered<LessonRepository>()) {
+    locator.registerLazySingleton<LessonRepository>(
+      () => LessonRepository(apiClient: locator<ApiClient>()),
+    );
+  }
 }
