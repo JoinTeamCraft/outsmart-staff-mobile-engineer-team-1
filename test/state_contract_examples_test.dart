@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:streaklearn/core/di/service_locator.dart';
 import 'package:streaklearn/core/state/app_state_manager.dart';
 
 class StreakBadge extends StatelessWidget {
@@ -99,6 +100,14 @@ void main() {
       expect(state.lastActivityDate, isNull);
       expect(events.last, isA<StreakChangedEvent>());
     });
+  });
+
+  test('locator reset disposes the manager and further use throws', () async {
+    setupLocator();
+    final manager = locator<AppStateManager>();
+    await locator.reset();
+
+    expect(() => manager.completeLesson('lesson-1'), throwsStateError);
   });
 
   testWidgets('contract widget example reads streak via provider',

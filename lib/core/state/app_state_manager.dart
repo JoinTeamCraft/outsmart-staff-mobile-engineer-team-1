@@ -20,6 +20,7 @@ class AppStateManager extends ChangeNotifier {
   QuizResult? _lastQuizResult;
   int _streakCount = 0;
   DateTime? _lastActivityDate;
+  bool _disposed = false;
 
   Set<String> get completedLessonIds => Set.unmodifiable(_completedLessonIds);
   QuizResult? get lastQuizResult => _lastQuizResult;
@@ -31,6 +32,7 @@ class AppStateManager extends ChangeNotifier {
       _completedLessonIds.contains(lessonId);
 
   void completeLesson(String lessonId) {
+    _checkNotDisposed();
     if (lessonId.trim().isEmpty) {
       throw ArgumentError.value(lessonId, 'lessonId', 'must not be empty');
     }
@@ -45,6 +47,7 @@ class AppStateManager extends ChangeNotifier {
     required int score,
     required int totalQuestions,
   }) {
+    _checkNotDisposed();
     if (quizId.trim().isEmpty) {
       throw ArgumentError.value(quizId, 'quizId', 'must not be empty');
     }
@@ -68,6 +71,7 @@ class AppStateManager extends ChangeNotifier {
   }
 
   void resetState() {
+    _checkNotDisposed();
     final previous = _streakCount;
     _completedLessonIds.clear();
     _lastQuizResult = null;
@@ -100,8 +104,15 @@ class AppStateManager extends ChangeNotifier {
     }
   }
 
+  void _checkNotDisposed() {
+    if (_disposed) {
+      throw StateError('AppStateManager was used after being disposed');
+    }
+  }
+
   @override
   void dispose() {
+    _disposed = true;
     _events.close();
     super.dispose();
   }
