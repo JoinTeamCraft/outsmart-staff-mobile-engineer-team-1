@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'app.dart';
 import 'core/di/service_locator.dart';
+import 'core/state/app_state_manager.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Set up service locator
+
   setupLocator();
-  
-  runApp(const StreakLearnApp());
+
+  runApp(
+    ChangeNotifierProvider.value(
+      value: locator<AppStateManager>(),
+      child: const StreakLearnApp(),
+    ),
+  );
 }
